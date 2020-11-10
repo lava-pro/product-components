@@ -21,7 +21,7 @@ Route::get('/products/find', function (Request $request) {
 
 // CRUD Substances -----------
 
-// SAhow
+// Show
 Route::get('/substances/{id?}', [SubstanceController::class, 'show']);
 
 // Create
