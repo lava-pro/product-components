@@ -29,17 +29,14 @@ class FrontendController extends Controller
             ->whereHas('substances', function ($query) use ($substances) {
                 $query->whereIn('substances.id', $substances);
             }, '>=', 2)
+            ->withCount('substances')
+            ->orderBy('substances_count', 'desc')
             ->get();
 
         if ($products->count() == 0) {
             return 'Не найдено лекарств...';
         }
 
-        $products->sortBy(function ($products) {
-            $products->substances->count();
-        });
-
-        // Try extract the products with count matches == 5
         $fives = $products->reject(function ($products) {
             return $products->substances->count() < 5;
         });
