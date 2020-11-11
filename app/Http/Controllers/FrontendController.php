@@ -38,7 +38,7 @@ class FrontendController extends Controller
         }
 
         $fives = $products->reject(function ($products) {
-            return $products->substances->count() < 5;
+            return $products->substances_count < 5;
         });
 
         if ($fives->count()) {
