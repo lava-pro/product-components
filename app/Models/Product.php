@@ -27,9 +27,9 @@ class Product extends Model
      *
      * @var array
      */
-    /*protected $with = [
+    protected $with = [
         'substances',
-    ];*/
+    ];
 
     /**
      * Product Substances
@@ -39,22 +39,6 @@ class Product extends Model
     public function substances()
     {
         return $this->belongsToMany(Substance::class);
-    }
-
-    /**
-     * Check if product is hidden (by Admin)
-     *
-     * @return boolean
-     */
-    public function isHidden()
-    {
-        foreach ($this->substances as $item) {
-            if ($item->status === 0) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

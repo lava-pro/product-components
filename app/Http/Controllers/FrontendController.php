@@ -22,46 +22,45 @@ class FrontendController extends Controller
             return 'Не ленись, добавь веществ...';
         }
 
-        $products = Product::where('status', 1)->get();
+        $products = Product::where('status', 1)
+            ->whereDoesntHave('substances', function ($query) {
+                $query->where('substances.status', 0);
+            })
+            ->whereHas('substances', function ($query) use ($substances) {
+                $query->whereIn('substances.id', $substances);
+            }, '>=', 2)
+            ->get();
+
+        if ($products->count() == 0) {
+            return 'Не найдено лекарств...';
+        }
 
         $results = [];
 
         foreach ($products as $product) {
-            if ($product->isHidden()) {
-                continue;
-            }
-
-            $matches = $product->countMatches($substances);
-
-            // Add result if more than one match
-            if ($matches > 1) {
-                $product->order = $matches;
-                $results[] = $product;
-            }
-        }
-
-        if (count($results) == 0) {
-            return 'Не найдено лекарств...';
+            $order = $product->countMatches($substances);
+            $product->order = $order;
+            $results[] = $product;
         }
 
         // Try extract the products with $matches == 5
-        $collection = collect($results)
+        $fives = collect($results)
             ->reject(function ($product) {
                 return $product->order < 5;
             });
 
-        if ($collection->count()) {
-            return $collection;
+        if ($fives->count()) {
+            return $fives;
         }
 
         // Sort the collection with reverse (for desc)
-        $collection = collect($results)
+        $sorteds = collect($results)
             ->sortBy('order')
             ->values()
             ->reverse()
             ->all();
 
-        return $collection;
+        return $sorteds;
     }
 
 }
