@@ -41,17 +41,4 @@ class Product extends Model
         return $this->belongsToMany(Substance::class);
     }
 
-    /**
-     * Get count found substances for product.
-     *
-     * @param  array  $substances  Substance ids
-     * @return  integer
-     */
-    public function countMatches(array $substances)
-    {
-        return $this->substances()
-            ->wherePivotIn('substance_id', $substances)
-            ->count();
-    }
-
 }

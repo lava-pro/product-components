@@ -35,32 +35,20 @@ class FrontendController extends Controller
             return 'Не найдено лекарств...';
         }
 
-        $results = [];
+        $products->sortBy(function ($products) {
+            $products->substances->count();
+        });
 
-        foreach ($products as $product) {
-            $order = $product->countMatches($substances);
-            $product->order = $order;
-            $results[] = $product;
-        }
-
-        // Try extract the products with $matches == 5
-        $fives = collect($results)
-            ->reject(function ($product) {
-                return $product->order < 5;
-            });
+        // Try extract the products with count matches == 5
+        $fives = $products->reject(function ($products) {
+            return $products->substances->count() < 5;
+        });
 
         if ($fives->count()) {
             return $fives;
         }
 
-        // Sort the collection with reverse (for desc)
-        $sorteds = collect($results)
-            ->sortBy('order')
-            ->values()
-            ->reverse()
-            ->all();
-
-        return $sorteds;
+        return $products;
     }
 
 }
