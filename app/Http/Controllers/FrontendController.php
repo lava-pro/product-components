@@ -11,15 +11,15 @@ class FrontendController extends Controller
      * Find the product by specific substances.
      * $request->substances = [1,2,3,5,7]
      *
-     * @param  \lluminate\Http\Request $request
-     * @return  mixed
+     * @param   \lluminate\Http\Request $request
+     * @return  \Illuminate\Http\Resources\Json 
      */
     public function findProducts(Request $request)
     {
         $substances = $request->substances;
 
         if (empty($substances) || count($substances) < 2) {
-            return 'Не ленись, добавь веществ...';
+            return ['Nothing to search...'];
         }
 
         $products = Product::where('status', 1)
@@ -31,7 +31,7 @@ class FrontendController extends Controller
             }, 5);
 
         if ($products->get()->count()) {
-            return $products->paginate();
+            return $products->get();
         }
 
         $products->orWhereHas('substances', function ($query) use ($substances) {
@@ -41,10 +41,10 @@ class FrontendController extends Controller
             ->orderBy('substances_count', 'desc');
 
         if ($products->count()) {
-            return $products->paginate();
+            return $products->get();
         }
 
-        return 'Не найдено лекарств...';
+        return ['Nothing found...'];
     }
 
 }
