@@ -28,24 +28,23 @@ class FrontendController extends Controller
             })
             ->whereHas('substances', function ($query) use ($substances) {
                 $query->whereIn('substances.id', $substances);
+            }, 5);
+
+        if ($products->get()->count()) {
+            return $products->paginate();
+        }
+
+        $products->orWhereHas('substances', function ($query) use ($substances) {
+                $query->whereIn('substances.id', $substances);
             }, '>=', 2)
             ->withCount('substances')
-            ->orderBy('substances_count', 'desc')
-            ->get();
+            ->orderBy('substances_count', 'desc');
 
-        if ($products->count() == 0) {
-            return 'Не найдено лекарств...';
+        if ($products->count()) {
+            return $products->paginate();
         }
 
-        $fives = $products->reject(function ($products) {
-            return $products->substances_count < 5;
-        });
-
-        if ($fives->count()) {
-            return $fives;
-        }
-
-        return $products;
+        return 'Не найдено лекарств...';
     }
 
 }
