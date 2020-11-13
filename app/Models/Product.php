@@ -32,6 +32,16 @@ class Product extends Model
     ];
 
     /**
+     * Get the fillable fields
+     *
+     * @return array
+     */
+    public function getFillable()
+    {
+        return $this->fillable;
+    }
+
+    /**
      * Product Substances
      *
      * @return \App\Models\Substance
